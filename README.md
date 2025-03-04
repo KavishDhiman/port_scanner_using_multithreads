@@ -12,3 +12,5 @@ This is a **fast Python-based port scanner** that uses **multithreading** to qui
 - Install dependencies:  
   ```bash
   pip install pyfiglet
+
+NOTE: Try running in cmd or terminal if it doesn't work in vscode

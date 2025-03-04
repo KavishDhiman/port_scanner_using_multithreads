@@ -2,18 +2,32 @@ import pyfiglet
 import socket
 import threading
 from datetime import datetime
+import ipaddress
 
 # Display banner
 ascii_banner = pyfiglet.figlet_format("PORT SCANNER")
 print(ascii_banner)
 
+# Function to validate IP
+def validate_ip(ip):
+    try:
+        ipaddress.ip_address(ip)
+        return True
+    except ValueError:
+        return False
+
 # Get target IP
-target = input("Target IP: ")
+while True:
+    target = input("Enter Target IP: ").strip()
+    if validate_ip(target):
+        break
+    else:
+        print("❌ Invalid IP address! Please enter a valid IP.")
 
 # Print scan details
-print("*" * 50)
-print("Scanning Target: " + target)
-print("Scanning started at: " + str(datetime.now()))
+print("\n" + "*" * 50)
+print(f"Scanning Target: {target}")
+print(f"Scanning started at: {datetime.now()}")
 print("*" * 50)
 
 # Function to scan a port
@@ -25,7 +39,7 @@ def scan_port(port):
         if result == 0:
             print(f"✅ Port {port} is OPEN!")
         s.close()
-    except:
+    except (socket.timeout, socket.error):
         pass
 
 # Using multithreading for faster scanning
@@ -33,8 +47,8 @@ def start_scan(start_port, end_port, thread_count=100):
     threads = []
     for port in range(start_port, end_port + 1):
         thread = threading.Thread(target=scan_port, args=(port,))
-        threads.append(thread)
         thread.start()
+        threads.append(thread)
 
         # Limit active threads to avoid overload
         if len(threads) >= thread_count:
@@ -46,7 +60,7 @@ def start_scan(start_port, end_port, thread_count=100):
     for t in threads:
         t.join()
 
-# Run the scanner (Scanning first 1025 ports)
-start_scan(1, 1025, thread_count=200)
+# Run the scanner (Scanning first 1024 ports)
+start_scan(1, 1024, thread_count=200)
 
 print("\n✅ Scan completed!")
